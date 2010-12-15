@@ -1,6 +1,6 @@
 #!perl -T
 
-use Test::More tests => 33;
+use Test::More tests => 34;
 
 BEGIN {
     use_ok( 'DateTime::Duration::Fuzzy', qw(time_ago) ) || print "Bail out!
@@ -40,10 +40,10 @@ t($now - dur(minutes => 60), $now, 'about an hour ago');
 
 t($now - dur(minutes => 100), $now, 'more than an hour ago');
 
-t($now - dur(hours => 4), $now, 'several hours ago');
+t($now - dur(hours => 4, minutes => 2), $now, 'several hours ago');
 
 $now = dt(year => 2010, month => 12, day => 12, hour => 23);
-my $then = $now->clone->set_hour(3);
+my $then = $now->clone->set_hour(3)->subtract(minutes => 2);
 t($then, $now, 'tonight');
 
 $then->set_hour(8);
@@ -52,7 +52,7 @@ t($then, $now, 'this morning');
 $then->set_hour(12);
 t($then, $now, 'today');
 
-$then->set_hour(17);
+$then->set_hour(16);
 t($then, $now, 'this afternoon');
 
 $then->set_day(11);
@@ -72,12 +72,15 @@ $then->set_month(11);
 t($then, $now, 'last month');
 
 $then->set_month(9);
-t($then, $now, 'this year');
+t($then, $now, 'several months ago');
+
+$then->set_month(1);
+t($then, $now, 'about a year ago');
 
 $then->set_year(2009);
 t($then, $now, 'last year');
 
-$then->set_year(2008);
+$then->set_year(2008)->set_month(9);
 $now->set_month(6);
 t($then, $now, 'more than a year ago');
 
